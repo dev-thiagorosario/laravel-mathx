@@ -14,6 +14,11 @@
 </head>
 
 <body>
+@php
+    $operationErrorMessage = (new \App\Exceptions\NoOperationSelectedException())->getMessage();
+    $quantityErrorMessage = (new \App\Exceptions\InvalidExerciseQuantityException())->getMessage();
+    $operandsErrorMessage = (new \App\Exceptions\InvalidOperandsRangeException())->getMessage();
+@endphp
 
 <!-- logo -->
 <div class="text-center my-3">
@@ -37,25 +42,25 @@
                 <p class="text-info">Operações:</p>
 
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="check_sum" name="check_sum" checked>
+                    <input class="form-check-input" type="checkbox" id="check_sum" name="check_sum" value="1" checked>
                     <label class="form-check-label" for="check_sum">Soma</label>
                 </div>
 
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" id="check_subtraction" name="check_subtraction"
-                           checked>
+                           value="1" checked>
                     <label class="form-check-label" for="check_subtraction">Subtração</label>
                 </div>
 
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" id="check_multiplication"
-                           name="check_multiplication" checked>
+                           name="check_multiplication" value="1" checked>
                     <label class="form-check-label" for="check_multiplication">Multiplicação</label>
                 </div>
 
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="check_division" name="check_division"
-                           checked>
+                           value="1" checked>
                     <label class="form-check-label" for="check_division">Divisão</label>
                 </div>
 
@@ -103,13 +108,39 @@
 
 </form>
 
-    <div class="container">
-        <div class="row">
-            <div class="alert alert-danger textcenter mt-3">
-                
+ <div class="container">
+    <div class="row">
+        @php
+            $operationFields = ['check_sum', 'check_subtraction', 'check_multiplication', 'check_division'];
+            $operandFields = ['number_one', 'number_two'];
+        @endphp
+
+        @if ($errors->hasAny($operationFields))
+            <div class="alert alert-danger text-center mt-3">
+                {{ $operationErrorMessage }}
             </div>
-        </div>
+        @endif
+
+        @if ($errors->has('number_exercises'))
+            <div class="alert alert-danger text-center mt-3">
+                {{ $quantityErrorMessage }}
+            </div>
+        @endif
+
+        @if ($errors->hasAny($operandFields))
+            <div class="alert alert-danger text-center mt-3">
+                {{ $operandsErrorMessage }}
+            </div>
+        @endif
+
+        @if ($errors->any() && ! $errors->hasAny(array_merge($operationFields, $operandFields, ['number_exercises'])))
+            <div class="alert alert-danger text-center mt-3">
+                {{ $errors->first() }}
+            </div>
+        @endif
     </div>
+</div>
+
 
 <!-- footer -->
 <footer class="text-center mt-5">
@@ -117,7 +148,7 @@
 </footer>
 
 <!-- bootstrap -->
-<script src="{{asset('assets/bootstrap/bootstrap.bundle.min.js')}}"></script>
+<script src="{{ asset('assets/bootstrap/bootstrap.bundle.min.js') }}"></script>
 </body>
 
 </html>

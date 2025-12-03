@@ -8,19 +8,30 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class GenerateExercisesRequest extends FormRequest
 {
-    public function rules()
+        public function rules(): array
     {
-        return [
-            'check_sum' => 'required_without_all:check_subtraction,check_multiplication,check_division',
-            'check_subtraction' => 'required_without_all:check_sum,check_multiplication,check_division',
-            'check_multiplication' => 'required_without_all:check_sum,check_subtraction,check_division',
-            'check_division' => 'required_without_all:check_sum,check_subtraction,check_multiplication',
-            'number_one' => 'required|integer|min:1|max:100',
-            'number_two' => 'required|integer|min:1|max:100',
+        $operations = [
+            'check_sum',
+            'check_subtraction',
+            'check_multiplication',
+            'check_division',
         ];
+
+        $rules = [];
+
+        foreach ($operations as $operation) {
+            $others = array_diff($operations, [$operation]);
+            $rules[$operation] = 'required_without_all:' . implode(',', $others) . '|boolean';
+        }
+
+        $rules['number_one']         = 'required|integer|min:0|max:999';
+        $rules['number_two']         = 'required|integer|min:0|max:999';
+        $rules['number_exercises']   = 'required|integer|min:5|max:50';
+
+        return $rules;
     }
 
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
