@@ -8,8 +8,8 @@ use Illuminate\View\View;
 
 class MainController extends Controller
 {
-    public function index(): View
+    public function __invoke(): View
     {
-        return view('/home');
+        return view('home');
     }
 }
